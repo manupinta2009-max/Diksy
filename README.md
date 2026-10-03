@@ -3,9 +3,11 @@
 **Hecho por Manuel Pintaluba**
 
 ### Descripción del problema y solución:
-Esta apliación trata de resolver mi problema personal, me cuesta escribir con cualquiera de las dos manos, sin embargo,es más fácil para mi escribir en computadora. Quiero anotar, de cualquier fuente que lea, definiciones en inglés y español. Pero no quiero que quede todo desordenado en un arichivo cualquiera de mi pc. Necesito un orden estricto. Que ordene las deficiniciones, cada vez que se cargue la palabra que se quiere anotar, se le agregue una fecha, una fuente y la propia definición en si. Como quiero que sean dos idiomas por separado, también se guardarían por serparado.
+Esta aplicación busca resolver una dificultad personal: me cuesta escribir a mano con cualquiera de las dos manos, por lo que me resulta mucho más fácil hacerlo en una computadora.
 
-Por si simplesa, creo que es necesario que no haya conexión online. Mucho menos es necesario una Base de Datos. Pienso que es más fácil de anotar
+Mi objetivo es registrar definiciones en inglés y español provenientes de diversas fuentes que consulto, sin que la información quede desorganizada en un archivo cualquiera de mi equipo. Por ello, requiero un orden estricto. La aplicación debe organizar las definiciones de modo que, cada vez que se ingrese una palabra, se agregue automáticamente la fecha, la fuente y la propia definición. Dado que manejo dos idiomas, las entradas deben guardarse por separado según la lengua correspondiente.
+
+Por simplicidad, considero esencial que no requiera conexión a internet ni el uso de una base de datos. Guardar la información de forma local resulta una alternativa mucho más sencilla e ideal para este propósito.
 
 
 ## Alcance
