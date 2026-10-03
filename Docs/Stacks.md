@@ -18,8 +18,13 @@
 | :--- | ---: |
 | Gradle | Gestión automatizada de librerías, dependencias y empaquetado del proyecto. |
 
-
 #### Librerías
-
+| Librería | Utilización |
+| :--- | ---: |
+| JUnit 5 | Pruebas unitarias de la validación y de la lectura/escritura de los TSV. |
+| java.nio.file (JDK) | Lectura y escritura de los archivos TSV, sin dependencias externas. |
 
 #### Interfaz Gráfica (UI)
+| Tecnología | Utilización |
+| :--- | ---: |
+| JavaFX | Toolkit de la interfaz: formulario de alta y tabla de definiciones. |
