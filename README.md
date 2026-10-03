@@ -41,4 +41,4 @@ Ambos archivos comparten el mismo esquema de columnas:
 fecha	palabra	fuente	definicion
 ```
  
-La especificación completa del formato (codificación, delimitadores, validaciones, invariantes y complejidad de las operaciones) está en [`docs/formato-de-datos.md`](docs/formato-de-datos.md).
+La especificación completa del formato (codificación, delimitadores, validaciones, invariantes y complejidad de las operaciones) está en [`docs/formato-de-datos.md`](Docs/formato_de_datos.md).
