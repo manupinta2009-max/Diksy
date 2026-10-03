@@ -3,12 +3,12 @@
 classDiagram
 
     class Palabra {
-        -Long id
-        -String palabra
-        -String definicion
-        -LocalDate fecha
-        -String fuente
-        -Idioma idioma
+        +String palabra
+        +String definicion
+        +LocalDate fecha
+        +String fuente
+        +Idioma idioma
+        +Long id
     }
 
     class Idioma {
@@ -16,15 +16,23 @@ classDiagram
         -String codigo
     }
 
-    class RepositorioPalabras {
+    class Manejo_Palabra {
         <<interface>>
-        +guardar(Palabra) void
-        +cargar() List~Palabra~
-        +eliminar(Long) void
-        +actualizar(Palabra) void
+        +leerPalabra() void
+        +editarPalabra() void
+    }
+
+    class RepoPalabras {
+        <<interface>>
+        +guardarPalabra() void
+        +cargarPalabras() void
+        +eliminarPalabra() void
+        +actualizarPalabra() void
     }
 
     Palabra --> Idioma
+    Palabra --> Manejo_Palabra : maneja
+    Manejo_Palabra --> RepoPalabras : guarda
 ```
 
 # Casos de uso:
