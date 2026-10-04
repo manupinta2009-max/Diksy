@@ -14,9 +14,9 @@
 | Java | Para la estructura y lógica de negocio del código. |
 
 #### Gestor de Dependencias y Build
-| Gestor| Utilización |
+| Gestor | Utilización |
 | :--- | ---: |
-| Gradle | Gestión automatizada de librerías, dependencias y empaquetado del proyecto. |
+| Maven | Gestión del proyecto, dependencias y proceso de compilación. |
 
 #### Librerías
 | Librería | Utilización |
