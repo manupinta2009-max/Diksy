@@ -35,8 +35,6 @@ classDiagram
     RepoPalabras --> Buscar_Palabra
 ```
 
-# Casos de uso:
-
 # Casos de uso
 
 ## CU-01 — Registrar palabra
