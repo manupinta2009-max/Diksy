@@ -1,38 +1,38 @@
 # UML
 ```mermaid
 classDiagram
-
     class Palabra {
-        +String palabra
-        +String definicion
-        +LocalDate fecha
-        +String fuente
-        +Idioma idioma
-        +Long id
+        - id_palabra : int
+        + palabra : String
+        + definicion : String
+        + fecha : date
+        + fuente : String
+        + idioma : Idioma
     }
 
     class Idioma {
-        -String nombre
-        -String codigo
-    }
-
-    class Manejo_Palabra {
-        <<interface>>
-        +leerPalabra() void
-        +editarPalabra() void
+        <<enumeration>>
+        ESPANOL
+        INGLES
     }
 
     class RepoPalabras {
-        <<interface>>
-        +guardarPalabra() void
-        +cargarPalabras() void
-        +eliminarPalabra() void
-        +actualizarPalabra() void
+        + guardarPalabra() void
+        + cargarPalabras() void
+        + eliminarPalabra() void
+        + actualizarPalabra() void
+        + verPalabra()
     }
 
-    Palabra --> Idioma
-    Palabra --> Manejo_Palabra : maneja
-    Manejo_Palabra --> RepoPalabras : guarda
+    class Buscar_Palabra {
+        + buscarXLetra()
+        + buscarXfecha()
+        + buscarXfuente()
+    }
+
+    Palabra ..> Idioma
+    Palabra --> RepoPalabras : maneja Palabras por
+    RepoPalabras --> Buscar_Palabra
 ```
 
 # Casos de uso:
