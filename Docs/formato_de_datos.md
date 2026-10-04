@@ -65,7 +65,7 @@ Notas sobre el campo `fecha`:
 - Formato **ISO 8601** de fecha calendario (`AAAA-MM-DD`), por ejemplo `2026-10-03`.
 - Es inequívoco, a diferencia de `03/10/2026`, que puede leerse como 3 de octubre o 10 de marzo según la convención regional.
 - Su **orden lexicográfico coincide con el cronológico**: ordenar las cadenas como texto equivale a ordenar las fechas en el tiempo. Esto permite ordenar sin convertir a un tipo de fecha.
-- La asigna el programa a partir del reloj del sistema; no se acepta como entrada del usuario.
+- La asigna el programa a partir del reloj del sistema; se acepta modificar la fecha por el usuario antes de cargar datos.
 Ejemplo de contenido (los separadores entre columnas son tabulaciones):
  
 ```
