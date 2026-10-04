@@ -2,7 +2,7 @@
 
 * **RF-01 — Registrar palabras:** El sistema debe permitir al usuario registrar una palabra junto con su definición, fuente e idioma.
 
-* **RF-02 — Asignar fecha automáticamente:** El sistema debe asignar automáticamente la fecha en la que se registra cada palabra, utilizando la fecha del sistema. El usuario debe poder ingresar otra manualmente.
+* **RF-02 — Asignar fecha automáticamente:** El sistema debe asignar automáticamente la fecha en la que se registra cada palabra, utilizando la fecha del sistema. El usuario debe poder modificar la fecha antes de cargar la palabra, si no le parece correcta la fecha que aparece por defecto.
 
 * **RF-03 — Separar palabras por idioma:** El sistema debe almacenar las palabras de cada idioma de forma independiente. Inicialmente se contemplan los idiomas español e inglés, pero el diseño debe permitir agregar otros idiomas posteriormente.
 
