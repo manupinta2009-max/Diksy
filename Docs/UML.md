@@ -34,6 +34,7 @@ classDiagram
     Palabra --> RepoPalabras : maneja Palabras por
     RepoPalabras --> Buscar_Palabra
 ```
+###### Id palabra es solo algo que ayudará al programador, no lo debe ver el usuario
 
 # Casos de uso
 
