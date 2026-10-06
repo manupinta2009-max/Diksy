@@ -30,7 +30,7 @@ classDiagram
         + buscarXfuente()
     }
 
-    Palabra ..> Idioma
+    Palabra --> Idioma
     Palabra --> RepoPalabras : maneja Palabras por
     RepoPalabras --> Buscar_Palabra
 ```
