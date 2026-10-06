@@ -27,4 +27,4 @@
 #### Interfaz Gráfica (UI)
 | Tecnología | Utilización |
 | :--- | ---: |
-| JavaFX | Toolkit de la interfaz: formulario de alta y tabla de definiciones. |
+| Swing | Toolkit de la interfaz: formulario de alta y tabla de definiciones. |
