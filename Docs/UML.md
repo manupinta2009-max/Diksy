@@ -2,12 +2,15 @@
 ```mermaid
 classDiagram
     class Palabra {
-        - id_palabra : int
-        + palabra : String
-        + definicion : String
-        + fecha : date
-        + fuente : String
-        + idioma : Idioma
+        -int id_palabra
+        -String palabra
+        -String definicion
+        -LocalDate fecha
+        -String fuente
+        -Idioma idioma
+        +getPalabra() String
+        +getFecha() LocalDate
+        +getFuente() String
     }
 
     class Idioma {
@@ -17,22 +20,24 @@ classDiagram
     }
 
     class RepoPalabras {
-        + guardarPalabra() void
-        + cargarPalabras() void
-        + eliminarPalabra() void
-        + actualizarPalabra() void
-        + verPalabra()
+        -List~Palabra~ palabras
+        +guardarPalabra() void
+        +cargarPalabras() void
+        +eliminarPalabra() void
+        +actualizarPalabra() void
+        +listar() List~Palabra~
     }
 
-    class Buscar_Palabra {
-        + buscarXLetra()
-        + buscarXfecha()
-        + buscarXfuente()
+    class BuscarPalabra {
+        -RepoPalabras repo
+        +buscarPorLetras(String letras) List~Palabra~
+        +buscarPorFecha(LocalDate fecha) List~Palabra~
+        +buscarPorFuente(String fuente) List~Palabra~
     }
 
     Palabra --> Idioma
-    Palabra --> RepoPalabras : maneja Palabras por
-    RepoPalabras --> Buscar_Palabra
+    RepoPalabras "1" o-- "*" Palabra : administra
+    BuscarPalabra ..> RepoPalabras : consulta
 ```
 ###### Id palabra es solo algo que ayudará al programador, no lo debe ver el usuario
 
@@ -168,3 +173,5 @@ El usuario organiza las palabras almacenadas según un criterio determinado.
 
 **Resultado:**  
 Las palabras se muestran ordenadas según el criterio seleccionado.
+
+
