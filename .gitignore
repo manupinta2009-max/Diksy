@@ -1,0 +1,26 @@
+# Compilación y binarios de Maven
+target/
+**/target/
+*.class
+**/*.class
+*.jar
+**/*.jar
+*.war
+*.ear
+
+# Archivos de configuración de IDEs y editores
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+nbproject/
+nb-configuration.xml
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
