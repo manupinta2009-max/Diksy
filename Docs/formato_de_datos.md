@@ -1,121 +1,115 @@
-# Elección de formato para el guardado de datos.
----
-#### **ESTE TEXTO NO LO ESCRIBÍ YO, LO HICE CON CLAUDE SONNET 5.5, ENTIENDO MUY POR ARRIBA LO QUE ES ESTE TIPO DE ARCHIVOS Y SU CODIFICACIÓN**
+# Especificación Técnica de Almacenamiento y Formato de Datos (TSV)
+
+Documento de diseño técnico que especifica el formato de persistencia local, codificación de caracteres, esquema de datos, reglas de validación y garantías de integridad en Diksy.
+
 ---
 
 ## 1. Archivo de texto plano
  
-Un archivo es una secuencia de bytes en un medio de almacenamiento. Se lo denomina *texto plano* cuando esos bytes se interpretan como caracteres mediante una **codificación** y no contienen metadatos de formato (tipografía, estilos, estructura binaria).
+Un archivo es una secuencia de bytes en un medio de almacenamiento. Se lo denomina *texto plano* cuando esos bytes se interpretan como caracteres legibles mediante una **codificación** estandarizada y no contienen metadatos propietarios ni estilos binarios complejos.
  
-El archivo no posee estructura intrínseca. No existen en él los conceptos de "campo", "registro" o "palabra": son convenciones que impone el programa que lo lee y lo escribe. Por eso es indispensable fijar de forma explícita la codificación, los delimitadores y el esquema.
+El archivo no posee estructura intrínseca en disco. No existen en él los conceptos de "campo", "registro" o "palabra": son convenciones que impone la aplicación que lo lee y lo escribe (`TsvStorage`). Por ello, es indispensable fijar de forma explícita la codificación, los delimitadores y el esquema.
  
 ### 1.1 Codificación
  
-- Codificación obligatoria: **UTF-8**.
-- Se recomienda **sin BOM** (*byte order mark*, la secuencia `EF BB BF` al inicio del archivo). Algunas aplicaciones, como Microsoft Excel, requieren el BOM para detectar UTF-8; si se abre allí el archivo y los caracteres con tilde o la ñ se muestran incorrectamente, es un problema de detección de codificación de la aplicación y no del archivo.
-- UTF-8 es necesario porque las palabras en español incluyen caracteres fuera de ASCII (á, é, í, ó, ú, ü, ñ, ¿, ¡), que se representan con secuencias de más de un byte. Leer con una codificación distinta a la de escritura produce *mojibake* (por ejemplo, `Ã±` en lugar de `ñ`).
+- Codificación obligatoria: **UTF-8** (`StandardCharsets.UTF_8`).
+- Formato **sin BOM** (*Byte Order Mark*).
+- UTF-8 es indispensable para representar fielmente caracteres especiales del español (á, é, í, ó, ú, ü, ñ, ¿, ¡) y posibles acentos en términos derivados de otros idiomas, evitando corrupción visual (*mojibake*).
+
 ### 1.2 Terminador de línea
  
-- Terminador de registro escrito por el programa: **LF** (`\n`, U+000A).
-- El lector debe tolerar **CRLF** (`\r\n`), que es el terminador habitual en Windows, y descartar el `\r` residual para que no pase a formar parte del último campo.
-## 2. Formato TSV
+- Terminador de registro estándar: **LF** (`\n`, U+000A).
+- Al leer, el parser tolera terminaciones de estilo Windows **CRLF** (`\r\n`), limpiando el retorno de carro (`\r`) para evitar contaminación en el último campo.
+
+
+## 2. Formato TSV (*Tab-Separated Values*)
  
-*Tab-Separated Values* es un formato tabular de texto plano con estas reglas:
+Se seleccionó TSV en lugar de CSV debido a que las definiciones y textos en lenguaje natural contienen comas con alta frecuencia (lo que obligaría a complejas reglas de entrecomillado y escapado). La tabulación horizontal rara vez forma parte de la redacción cotidiana, lo que simplifica el saneamiento.
  
 | Elemento | Regla |
 |---|---|
-| Registro | Una línea del archivo |
-| Campo | Subcadena delimitada por tabulaciones dentro de una línea |
-| Delimitador de campo | Tabulación horizontal, U+0009 (`\t`) |
-| Delimitador de registro | Salto de línea (`\n`) |
-| Encabezado | Primera línea; nombra las columnas y no es un registro de datos |
+| **Registro** | Una línea completa de texto dentro del archivo |
+| **Campo** | Subcadena delimitada por tabulaciones dentro de la línea |
+| **Delimitador de campo** | Tabulación horizontal (`\t`, U+0009) |
+| **Delimitador de registro** | Salto de línea (`\n`) |
+| **Encabezado** | Primera línea; define los nombres canónicos de las columnas |
  
-A diferencia de CSV, **TSV no define mecanismo de escapado**: el delimitador no puede aparecer dentro de un campo. Esto elimina la ambigüedad de las comas dentro de las definiciones, pero obliga a sanear la entrada (ver sección 5).
+La interpretación es **posicional**: el sistema asigna el significado de cada dato por el índice de su columna. Por ello, el orden de las columnas es estrictamente invariante.
+
+
+## 3. Archivos de datos y organización
+
+Los registros se almacenan por separado según el idioma en la carpeta `datos/`:
  
-La interpretación de cada campo es **posicional**: el programa asigna el significado de un valor por el índice de su columna, no por una etiqueta. Un registro con los campos en distinto orden sigue siendo sintácticamente válido, pero semánticamente corrupto, y ninguna herramienta lo detectará. Por esa razón el orden de las columnas es invariante.
+| Archivo | Idioma | Contenido |
+|---|---|---|
+| `datos/definiciones_en.tsv` | Inglés | Vocabulario y términos en inglés |
+| `datos/definiciones_es.tsv` | Español | Vocabulario y términos en español |
  
-## 3. Archivos de datos
+La separación física por archivo evita redundancia (no es necesario almacenar una columna repetitiva de idioma en cada fila) y permite respaldar, sincronizar o compartir vocabularios de manera independiente.
+
+
+## 4. Esquema de Columnas
  
-Un archivo por idioma, dentro de la carpeta `datos/`:
+Primera línea de cada archivo (encabezado canónico):
  
-| Archivo | Idioma |
-|---|---|
-| `datos/definiciones_en.tsv` | Inglés |
-| `datos/definiciones_es.tsv` | Español |
- 
-La separación por archivo, en lugar de una columna "idioma", evita repetir ese valor en cada registro y permite leer, respaldar o editar cada idioma de forma independiente. Ambos archivos comparten el mismo esquema.
- 
-## 4. Esquema
- 
-Primera línea de cada archivo (encabezado):
- 
-```
+```text
 fecha	palabra	fuente	definicion
 ```
  
 | N.º | Columna | Tipo | Obligatorio | Origen del valor | Descripción |
 |---|---|---|---|---|---|
-| 1 | `fecha` | Cadena `AAAA-MM-DD` | Sí | Automático | Fecha de registro |
-| 2 | `palabra` | Cadena | Sí | Usuario | Término que se define |
-| 3 | `fuente` | Cadena | Sí | Usuario | Origen de la definición (libro, artículo, sitio, etc.) |
-| 4 | `definicion` | Cadena | Sí | Usuario | Texto de la definición |
+| 1 | `fecha` | Cadena ISO `AAAA-MM-DD` | Sí | Sistema / Usuario | Fecha del registro (por defecto la fecha actual). |
+| 2 | `palabra` | Cadena | Sí | Usuario | Término o vocablo que se registra. |
+| 3 | `fuente` | Cadena | Sí | Usuario | Referencia de origen (libro, artículo, conferencia, etc.). |
+| 4 | `definicion` | Cadena | Sí | Usuario | Explicación o significado de la palabra. |
  
-Notas sobre el campo `fecha`:
- 
-- Formato **ISO 8601** de fecha calendario (`AAAA-MM-DD`), por ejemplo `2026-10-03`.
-- Es inequívoco, a diferencia de `03/10/2026`, que puede leerse como 3 de octubre o 10 de marzo según la convención regional.
-- Su **orden lexicográfico coincide con el cronológico**: ordenar las cadenas como texto equivale a ordenar las fechas en el tiempo. Esto permite ordenar sin convertir a un tipo de fecha.
-- La asigna el programa a partir del reloj del sistema; se acepta modificar la fecha por el usuario antes de cargar datos.
-Ejemplo de contenido (los separadores entre columnas son tabulaciones):
- 
-```
-fecha	palabra	fuente	definicion
-2026-10-03	ubiquitous	Libro: Sapiens	present or found everywhere
-2026-10-03	ubiquitous	Artículo BBC	seeming to be in all places at the same time
-```
- 
-## 5. Reglas de validación
- 
-El archivo es texto libre y cualquier editor puede romper su estructura. El orden estricto lo garantiza el programa, **único escritor autorizado**, mediante validación y saneamiento antes de cada escritura.
- 
-1. **Campos obligatorios no vacíos.** `palabra`, `fuente` y `definicion` deben contener al menos un carácter que no sea espacio en blanco. Si no, se rechaza el registro.
-2. **Saneamiento de delimitadores.** Toda tabulación (`\t`) y todo salto de línea (`\n`, `\r`) presente en la entrada del usuario se reemplaza por un espacio. La tabulación generaría una columna adicional y el salto de línea generaría una fila adicional, rompiendo el esquema.
-3. **Recorte de espacios.** Se eliminan los espacios al inicio y al final de cada campo. Sin esto, `casa` y `casa ` serían cadenas distintas.
-4. **Fecha generada por el sistema.** Nunca proviene de la entrada.
-5. **Aridad fija.** Cada registro escrito contiene exactamente cuatro campos, es decir, tres tabulaciones.
+### Notas sobre el campo `fecha`
+- Formato según norma internacional **ISO-8601** (`AAAA-MM-DD`, ej. `2026-10-28`).
+- Es unívoco y no ambiguo frente a convenciones regionales.
+- Su orden lexicográfico coincide con el cronológico, permitiendo comparaciones directas.
+- El sistema propone automáticamente la fecha local (`LocalDate.now()`), pero permite que el usuario la modifique manualmente para registrar palabras aprendidas en días previos.
+
+### Identificador de sesión (`idPalabra`)
+El modelo de dominio `Palabra` contiene el atributo `idPalabra` (numérico entero). Este identificador es asignado de forma dinámica y autoincremental en memoria al cargar las palabras desde el archivo TSV. **No se almacena en el archivo en disco** para mantener el esquema liviano y permitir edición manual limpia con editores de texto externos.
+
+
+## 5. Reglas de Validación y Saneamiento
+
+Para preservar la integridad del formato ante cualquier entrada del usuario:
+
+1. **Campos obligatorios:** Los campos `palabra`, `fuente` y `definicion` no pueden estar vacíos ni formados exclusivamente por espacios en blanco.
+2. **Saneamiento de delimitadores:** Toda tabulación (`\t`) y salto de línea (`\n`, `\r`) dentro del texto ingresado por el usuario se convierte automáticamente en un espacio simple mediante el método `TsvStorage.sanear()`. Esto previene desfasajes de columnas o registros rotos.
+3. **Recorte de espacios (*trim*):** Se eliminan espacios redundantes al inicio y final de cada campo antes de persistir.
+4. **Validación de formato de fecha:** Si la fecha fue editada por el usuario, el sistema valida que cumpla con el patrón `AAAA-MM-DD` mediante `LocalDate.parse()`. Si es inválida, se detiene el guardado y se notifica el error.
+5. **Aridad fija de 4 columnas:** Cada registro válido debe contener exactamente 3 tabulaciones separadoras.
+
+
 ## 6. Invariantes del archivo
- 
-- La primera línea es siempre el encabezado exacto de la sección 4.
-- Toda línea de datos tiene exactamente cuatro campos.
-- No hay líneas vacías intermedias. Al leer, se ignora una línea vacía final causada por el último terminador de línea.
-- **Se admiten repeticiones de `palabra`.** Dos registros con la misma palabra y distinta fuente son información distinta, no duplicados a eliminar.
-- Los registros se anexan en orden de inserción, por lo que el archivo queda ordenado cronológicamente de forma natural.
-## 7. Operaciones y complejidad
- 
-| Operación | Procedimiento | Costo |
+
+- La primera línea es siempre el encabezado unificado: `fecha\tpalabra\tfuente\tdefinicion`.
+- Toda línea de datos contiene exactamente 4 columnas válidas.
+- No se permiten líneas en blanco intermedias.
+- **Se admiten repeticiones de la misma palabra:** Una misma palabra puede registrarse varias veces si proviene de distintas fuentes o aporta acepciones y contextos diferentes.
+- Las nuevas altas se agregan al final del archivo (*append*), manteniendo un orden cronológico natural por defecto.
+
+
+## 7. Operaciones y Complejidad Algorítmica
+
+| Operación | Implementación | Complejidad Temporal |
 |---|---|---|
-| Alta | Anexar una línea al final del archivo (*append*) | O(1) respecto del tamaño del archivo |
-| Consulta | Leer secuencialmente y filtrar | O(n) |
-| Modificación o baja | Cargar todos los registros en memoria, alterar la colección y reescribir el archivo completo | O(n) |
- 
-Un archivo de texto es una secuencia contigua de bytes sin índice ni huecos reutilizables. Modificar un registro de longitud distinta desplaza todos los bytes posteriores, por lo que no es posible editar "en el lugar". Para el volumen de un uso personal (miles de registros) el costo es despreciable.
- 
-**Escritura segura.** Para evitar corrupción si el programa se interrumpe durante la reescritura completa, se recomienda escribir primero en un archivo temporal y luego reemplazar el original (renombrado, que en la mayoría de los sistemas de archivos es una operación atómica).
- 
-## 8. Limitaciones conocidas
- 
-- **Sin unicidad forzada.** El formato no impide registros repetidos; cualquier control adicional recae en el código.
-- **Sin integridad referencial.** No hay vínculo entre una palabra en inglés y su equivalente en español, ya que cada archivo es independiente.
-- **Sin transacciones ni concurrencia.** Dos procesos escribiendo a la vez sobre el mismo archivo pueden corromperlo. El diseño asume un único proceso escritor.
-- **Búsqueda lineal.** No existen índices; el costo de consulta crece con el tamaño del archivo.
-Si alguna de estas limitaciones deja de ser aceptable, la alternativa natural es un motor embebido de un solo archivo, como SQLite.
- 
-## 9. Respaldo
- 
-El almacenamiento es local y de archivo único por idioma. La pérdida o corrupción del archivo implica la pérdida de sus datos. Se recomienda copiar periódicamente la carpeta `datos/` a un medio externo.
- 
-## 10. Decisiones abiertas
- 
-- **Vinculación entre idiomas.** Si en el futuro se desea asociar una palabra en inglés con su traducción en español, el esquema requerirá una columna adicional (por ejemplo, un identificador común). Es preferible resolverlo antes de implementar para no migrar archivos ya cargados.
-- **Normalización de mayúsculas.** Falta definir si `Casa` y `casa` se tratan como la misma palabra en comparaciones y búsquedas.
- 
+| **Alta (registro nuevo)** | Anexar una línea al final del archivo (*append mode*) | $O(1)$ respecto al tamaño del archivo |
+| **Consulta / Carga inicial** | Lectura secuencial línea por línea cargando a memoria | $O(n)$ |
+| **Búsqueda / Filtrado** | Búsqueda en memoria por coincidencia parcial insensible a mayúsculas | $O(n)$ |
+| **Ordenamiento** | Algoritmo TimSort (`List.sort`) usando `java.text.Collator` | $O(n \log n)$ |
+| **Edición o Eliminación** | Reescribir la lista completa en memoria sobre el archivo en disco | $O(n)$ |
+
+### Mecanismo de persistencia atómica y segura
+Al modificar o eliminar registros, `TsvStorage` reescribe la información utilizando un archivo temporal con extensión `.tmp` en el mismo directorio. Una vez completada y verificada la escritura sin errores, el archivo temporal reemplaza al original mediante `Files.move` con reemplazo atómico. Esto protege los datos contra cortes de energía o caídas de la aplicación durante la escritura.
+
+
+## 8. Limitaciones y Evolución Futura
+
+- **Monoproceso:** El diseño asume un único usuario en un equipo de escritorio local, sin soporte para escritura concurrente entre múltiples procesos simultáneos.
+- **Búsqueda lineal en memoria:** Óptimo y casi instantáneo para colecciones personales de miles de palabras. Si el volumen superara cientos de miles de entradas, se evaluaría un motor embebido como SQLite.
+- **Normalización de mayúsculas:** Las búsquedas son insensibles a mayúsculas, minúsculas y tildes gracias a `Collator`, pero se preserva la capitalización original elegida por el usuario al guardar.

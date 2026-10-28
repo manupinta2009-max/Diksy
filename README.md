@@ -15,9 +15,11 @@ Por simplicidad, considero esencial que no requiera conexión a internet ni el u
 Mi proyecto contempla: 
 - Guardado de palabras y sus definiciones.
 - Edición de datos guardados.
-- Leer datos guardados.
-- Organizar palabras.
-- Buscar palabras.
+- Consulta y visualización interactiva.
+- Organización y ordenamiento alfabético, cronológico y por fuente.
+- Búsqueda en tiempo real por término, definición o fuente.
+- Interfaz gráfica de escritorio moderna con soporte de tema oscuro.
+- Empaquetado autónomo en `.jar` ejecutable y lanzador para sistemas operativos de escritorio.
 
 
 ## Alternativas consideradas
@@ -50,24 +52,33 @@ La especificación completa del formato (codificación, delimitadores, validacio
 Diksy/
 ├── Docs/                     # Documentación de arquitectura, diseño y formatos
 │   ├── formato_de_datos.md   # Especificación técnica del almacenamiento TSV
-│   ├── UML.md                # Diagramas de clases y casos de uso
-│   └── Stacks.md             # Tecnologías y herramientas utilizadas
+│   ├── Requi.md              # Requisitos funcionales y no funcionales
+│   ├── Stacks.md             # Tecnologías, librerías y herramientas utilizadas
+│   └── UML.md                # Diagramas de clases, arquitectura y casos de uso
 ├── datos/                    # Carpeta local para los archivos TSV (definiciones)
+│   ├── definiciones_en.tsv   # Almacén de vocabulario en inglés
+│   └── definiciones_es.tsv   # Almacén de vocabulario en español
+├── Diksy.desktop             # Acceso directo para el menú de aplicaciones en Linux
+├── diksy.sh                  # Script bash para lanzamiento directo del JAR
 ├── mavenproject1/            # Código fuente del proyecto en Java (Maven)
-│   ├── pom.xml               # Configuración de dependencias y compilación
+│   ├── pom.xml               # Configuración de dependencias, FlatLaf y plugins
 │   └── src/
-│       ├── main/java/com/diksy/  # Lógica principal de la aplicación
+│       ├── main/java/com/diksy/
 │       │   ├── Idioma.java       # Enumeración con los idiomas soportados
-│       │   ├── Palabra.java      # Modelo de datos de una definición
+│       │   ├── Palabra.java      # Modelo de datos del registro
 │       │   ├── RepoPalabras.java # Repositorio de gestión de palabras en memoria
-│       │   ├── BuscarPalabras.java # Módulo de búsqueda y filtrado
+│       │   ├── BuscarPalabras.java # Módulo de búsqueda, filtros y ordenamiento
 │       │   ├── TsvStorage.java   # Gestor de persistencia TSV atómica y UTF-8
-│       │   └── Main.java         # Punto de entrada / ejecución
+│       │   ├── Main.java         # Prueba de ejecución básica por consola
+│       │   └── gui/
+│       │       └── DiksyVentanaPrincipal.java # Interfaz gráfica Swing (FlatLaf)
 │       └── test/java/com/diksy/  # Pruebas automatizadas (JUnit 5)
 │           ├── PalabraTest.java        # Pruebas del modelo de datos
 │           ├── RepoPalabrasTest.java   # Pruebas del repositorio en memoria
 │           ├── BuscarPalabrasTest.java # Pruebas de búsqueda y ordenamiento (Collator)
-│           └── TsvStorageTest.java     # Pruebas del almacenamiento TSV y atomicidad
+│           ├── TsvStorageTest.java     # Pruebas del almacenamiento TSV y atomicidad
+│           └── gui/
+│               └── DiksyVentanaPrincipalTest.java # Pruebas de la interfaz gráfica
 ├── .gitignore                # Archivos y carpetas excluidas del control de versiones
 └── README.md                 # Portada y guía general del proyecto
 ```
@@ -76,10 +87,10 @@ Diksy/
 ## Requisitos del sistema
 
 - **Java Development Kit (JDK):** Versión 17 LTS o superior.
-- **Apache Maven:** Versión 3.8 o superior (o utilizar el soporte integrado de su IDE: VS Code, NetBeans, IntelliJ).
+- **Apache Maven:** Versión 3.8 o superior (para compilar desde el código fuente o mediante IDE como VS Code, NetBeans o IntelliJ).
 
 
-## Compilación y ejecución
+## Compilación y desarrollo
 
 Desde la carpeta del proyecto `mavenproject1/`:
 
@@ -88,7 +99,7 @@ Desde la carpeta del proyecto `mavenproject1/`:
    mvn clean compile
    ```
 
-2. **Ejecutar la aplicación:**
+2. **Ejecutar en modo desarrollo (inicia la interfaz gráfica):**
    ```bash
    mvn exec:java
    ```
@@ -99,14 +110,58 @@ Desde la carpeta del proyecto `mavenproject1/`:
    ```
 
 
+## Empaquetado y Distribución
+
+1. **Generar el ejecutable autónomo (`diksy.jar`):**
+   ```bash
+   cd mavenproject1
+   mvn clean package
+   ```
+   El plugin `maven-assembly-plugin` compilará las dependencias necesarias (incluyendo el tema FlatLaf) y generará el archivo `diksy.jar` listo para ejecutarse en la raíz del proyecto.
+
+2. **Lanzar la aplicación directamente:**
+   Desde la raíz del proyecto:
+   ```bash
+   ./diksy.sh
+   ```
+   O con el comando directo de Java:
+   ```bash
+   java -jar diksy.jar
+   ```
+
+3. **Instalación como aplicación de escritorio (Linux):**
+   Para integrar Diksy al lanzador de aplicaciones de tu distribución (GNOME, KDE, XFCE, etc.):
+   - Abre `Diksy.desktop` y verifica que las rutas `Exec` y `Path` coincidan con la ubicación del proyecto en tu equipo.
+   - Otorga permisos de ejecución al script y al archivo de escritorio:
+     ```bash
+     chmod +x diksy.sh Diksy.desktop
+     ```
+   - Cópialo a tu directorio de aplicaciones de usuario:
+     ```bash
+     cp Diksy.desktop ~/.local/share/applications/
+     ```
+
+
+## Interfaz Gráfica
+
+La interfaz gráfica fue construida con **Java Swing** y estilizada mediante **FlatLaf Dark**, ofreciendo:
+* **Selector lateral de idiomas:** Cambio instantáneo entre Español e Inglés con recarga dinámica de registros.
+* **Filtro de búsqueda en tiempo real:** Búsqueda predictiva e insensible a mayúsculas que filtra por término, definición o fuente a medida que se escribe.
+* **Tabla interactiva:** Permite visualizar los registros existentes y seleccionar cualquiera para cargarlo en el formulario de edición.
+* **Formulario con validación integrada:** Inserción y actualización atómica en el archivo TSV correspondiente, con propuesta automática de fecha ISO-8601 (`AAAA-MM-DD`).
+* **Protección contra pérdida de datos:** Confirmación mediante diálogo modal antes de eliminar palabras y escritura segura mediante archivos temporales.
+
+
 ## Estado del proyecto y Roadmap
 
 - [x] Definición del problema, alcance y arquitectura.
 - [x] Especificación técnica de almacenamiento en TSV UTF-8.
 - [x] Modelos de datos del dominio (`Palabra`, `Idioma`).
-- [x] Lógica de repositorio en memoria y motor de búsqueda básico.
-- [x] Estandarización de paquetes (`com.diksy`) y `.gitignore`.
-- [x] Implementación del almacenamiento persistente en archivos TSV (`datos/`).
-- [x] Pruebas unitarias completas con JUnit 5.
-- [ ] Interfaz gráfica de escritorio con Java Swing.
-- [ ] Empaquetado final en archivo ejecutable `.jar`.
+- [x] Lógica de repositorio en memoria y motor de búsqueda con soporte lingüístico (`Collator`).
+- [x] Estandarización de paquetes (`com.diksy`) y control de versiones `.gitignore`.
+- [x] Persistencia atómica y resiliente en archivos TSV (`datos/`).
+- [x] Pruebas unitarias completas con JUnit 5 (dominio, repositorio, persistencia y GUI).
+- [x] Interfaz gráfica de escritorio completa (Java Swing + FlatLaf Dark Theme).
+- [x] Empaquetado en fat JAR ejecutable (`diksy.jar`) y lanzador de escritorio para Linux.
+- [ ] Exportación de datos a formatos adicionales (JSON, CSV, Markdown).
+- [ ] Estadísticas y métricas de palabras aprendidas por semana/mes.
