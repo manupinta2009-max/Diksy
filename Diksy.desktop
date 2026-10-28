@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Diksy
+Comment=Diccionario Personal y Gestor de Palabras
+Exec=/home/manuel/Documentos/Diksy/Diksy/diksy.sh
+Path=/home/manuel/Documentos/Diksy/Diksy
+Icon=accessories-dictionary
+Terminal=false
+Categories=Office;Utility;Dictionary;
+StartupNotify=true
+

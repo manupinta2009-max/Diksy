@@ -65,16 +65,24 @@ public class BuscarPalabras {
     // SIT-03.2: Insensibilidad a mayúsculas y espacios (trim + toLowerCase)
     // SIT-03.4: Si el criterio está vacío, retorna la lista completa
     public List<Palabra> buscarGeneral(String criterio) {
-        List<Palabra> resultados = new ArrayList<>();
         if (repo == null) {
+            return new ArrayList<>();
+        }
+        return buscar(repo.listar(), criterio);
+    }
+
+    // Búsqueda en una lista por coincidencia en palabra, definición o fuente
+    public static List<Palabra> buscar(List<Palabra> lista, String criterio) {
+        List<Palabra> resultados = new ArrayList<>();
+        if (lista == null) {
             return resultados;
         }
         if (criterio == null || criterio.trim().isEmpty()) {
-            return repo.listar();
+            return new ArrayList<>(lista);
         }
 
         String busqueda = criterio.trim().toLowerCase();
-        for (Palabra p : repo.listar()) {
+        for (Palabra p : lista) {
             boolean coincidePalabra = p.getPalabra() != null && p.getPalabra().toLowerCase().contains(busqueda);
             boolean coincideDefinicion = p.getDefinicion() != null && p.getDefinicion().toLowerCase().contains(busqueda);
             boolean coincideFuente = p.getFuente() != null && p.getFuente().toLowerCase().contains(busqueda);
@@ -89,7 +97,7 @@ public class BuscarPalabras {
     // SIT-06.1 y SIT-06.2: Ordenamiento alfabético con Collator en español
     public static void ordenarPorPalabra(List<Palabra> lista, boolean ascendente) {
         if (lista == null) return;
-        Collator collator = Collator.getInstance(new Locale("es", "ES"));
+        Collator collator = Collator.getInstance(Locale.forLanguageTag("es-ES"));
         lista.sort((p1, p2) -> {
             String s1 = p1.getPalabra() != null ? p1.getPalabra() : "";
             String s2 = p2.getPalabra() != null ? p2.getPalabra() : "";
@@ -111,7 +119,7 @@ public class BuscarPalabras {
     // CU-06: Ordenamiento por fuente
     public static void ordenarPorFuente(List<Palabra> lista, boolean ascendente) {
         if (lista == null) return;
-        Collator collator = Collator.getInstance(new Locale("es", "ES"));
+        Collator collator = Collator.getInstance(Locale.forLanguageTag("es-ES"));
         lista.sort((p1, p2) -> {
             String s1 = p1.getFuente() != null ? p1.getFuente() : "";
             String s2 = p2.getFuente() != null ? p2.getFuente() : "";
