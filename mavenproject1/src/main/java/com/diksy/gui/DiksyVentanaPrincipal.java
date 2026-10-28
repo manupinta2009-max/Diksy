@@ -185,12 +185,16 @@ public class DiksyVentanaPrincipal extends JFrame {
             }
         };
         tablaPalabras = new JTable(modeloTabla);
+        // Ocultar visualmente la columna ID para el usuario final (permanece en el modelo de datos)
+        tablaPalabras.removeColumn(tablaPalabras.getColumn("ID"));
+
         tablaPalabras.setRowHeight(28);
         tablaPalabras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaPalabras.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tablaPalabras.getSelectedRow() != -1) {
-                int fila = tablaPalabras.getSelectedRow();
-                int id = (int) modeloTabla.getValueAt(fila, 0);
+                int filaVisual = tablaPalabras.getSelectedRow();
+                int filaModelo = tablaPalabras.convertRowIndexToModel(filaVisual);
+                int id = (int) modeloTabla.getValueAt(filaModelo, 0);
                 mostrarDetallePalabra(id);
             }
         });
