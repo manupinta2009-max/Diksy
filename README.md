@@ -164,5 +164,6 @@ La interfaz gráfica fue construida con **Java Swing** y estilizada mediante **F
 - [x] Interfaz gráfica de escritorio completa (Java Swing + FlatLaf Dark Theme).
 - [x] Empaquetado en fat JAR ejecutable (`diksy.jar`) y lanzador de escritorio para Linux.
 - [ ] Actualizar la GUI a una más linda y parecida a lo que me imagino.
+- [ ] Actualizar la forma de busqueda y el orden de palabras, o sea ordenar por fecha, alfabetico, etc.
 - [ ] Exportación de datos a formatos adicionales (JSON, CSV, Markdown).
 - [ ] Estadísticas y métricas de palabras aprendidas por semana/mes.
